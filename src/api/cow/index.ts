@@ -1,8 +1,8 @@
 import log from 'loglevel'
 import fetch from 'cross-fetch'
 import { OrderKind, QuoteQuery } from '@gnosis.pm/gp-v2-contracts'
-import { SupportedChainId as ChainId } from '/constants/chains'
-import { getSigningSchemeApiValue, OrderCreation } from '/utils/sign'
+import { SupportedChainId as ChainId } from '../../constants/chains'
+import { getSigningSchemeApiValue, OrderCreation } from '../../utils/sign'
 import OperatorError, { ApiErrorCodeDetails, ApiErrorCodes, ApiErrorObject } from './errors/OperatorError'
 import QuoteError, {
   GpQuoteErrorCodes,
@@ -10,10 +10,10 @@ import QuoteError, {
   mapOperatorErrorToQuoteError,
   GpQuoteErrorDetails,
 } from './errors/QuoteError'
-import { toErc20Address } from '/utils/tokens'
-import { FeeQuoteParams, PriceInformation, PriceQuoteParams, SimpleGetQuoteResponse } from '/utils/price'
+import { toErc20Address } from '../../utils/tokens'
+import { FeeQuoteParams, PriceInformation, PriceQuoteParams, SimpleGetQuoteResponse } from '../../utils/price'
 
-import { ZERO_ADDRESS } from '/constants'
+import { ZERO_ADDRESS } from '../../constants'
 import {
   GetOrdersParams,
   GetTradesParams,
@@ -22,9 +22,9 @@ import {
   OrderMetaData,
   ProfileData,
   TradeMetaData,
-} from '/api/cow/types'
-import { CowError, objectToQueryString } from '/utils/common'
-import { Context } from '/utils/context'
+} from './types'
+import { CowError, objectToQueryString } from '../../utils/common'
+import { Context } from '../../utils/context'
 
 function getGnosisProtocolUrl(isDev: boolean): Partial<Record<ChainId, string>> {
   if (isDev) {
@@ -136,12 +136,13 @@ export class CowApi<T extends ChainId> {
 
       if (!response.ok) {
         const errorResponse = await response.json()
-        throw new CowError(errorResponse)
+        throw new OperatorError(errorResponse)
       } else {
         return response.json()
       }
     } catch (error) {
       log.error('Error getting trades:', error)
+      if (error instanceof OperatorError) throw error
       throw new CowError('Error getting trades: ' + error)
     }
   }
@@ -162,6 +163,7 @@ export class CowApi<T extends ChainId> {
       }
     } catch (error) {
       log.error('Error getting orders information:', error)
+      if (error instanceof OperatorError) throw error
       throw new OperatorError(UNHANDLED_ORDER_ERROR)
     }
   }
@@ -198,6 +200,7 @@ export class CowApi<T extends ChainId> {
       }
     } catch (error) {
       log.error('Error getting order information:', error)
+      if (error instanceof OperatorError) throw error
       throw new OperatorError(UNHANDLED_ORDER_ERROR)
     }
   }

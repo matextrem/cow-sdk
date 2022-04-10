@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "/*": ["src/*"]
-    },
     "moduleResolution": "node",
     "module": "ESNext",
     "target": "ESNext",
@@ -14,5 +10,9 @@
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
-  }
+    "useUnknownInCatchVariables": false,
+  },
+  "exclude": [
+    "dist"
+  ]
 }
